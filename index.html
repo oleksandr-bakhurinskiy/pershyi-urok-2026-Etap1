@@ -230,29 +230,41 @@ function handleCredentialResponse(response) {
     let participantsData = []; // Глобальна змінна для зберігання даних учасників
 
 function loadParticipants() {
-    // Передаємо email як параметр у запиті
     const url = `${GOOGLE_SCRIPT_URL}?action=getParticipants&email=${currentUserEmail}&t=${new Date().getTime()}`;
     
     fetch(url)
-        .then(res => res.json())
-        .then(participants => {
-            participantsData = participants; 
-            const select = document.getElementById('participantName');
-            
-            if (participants.length === 0) {
-                select.innerHTML = '<option value="">Ви оцінили всіх доступних учасників</option>';
-                return;
-            }
-
-            select.innerHTML = '<option value="">-- Оберіть студента --</option>';
-            participants.forEach((p, index) => {
-                let opt = document.createElement('option');
-                opt.value = index;
-                opt.textContent = `${p[0]} (${p[1]})`;
-                select.appendChild(opt);
-            });
+        .then(response => {
+            // Перевірка, чи не прийшла помилка 404 або 500
+            if (!response.ok) throw new Error('Скрипт повернув помилку ' + response.status);
+            return response.text(); // Спочатку беремо як текст, щоб перевірити
         })
-        .catch(err => console.error("Помилка:", err));
+        .then(text => {
+            try {
+                const participants = JSON.parse(text); // Пробуємо перетворити на JSON
+                participantsData = participants; 
+                const select = document.getElementById('participantName');
+                
+                if (participants.length === 0) {
+                    select.innerHTML = '<option value="">Всі учасники вже оцінені</option>';
+                    return;
+                }
+
+                select.innerHTML = '<option value="">-- Оберіть студента --</option>';
+                participants.forEach((p, index) => {
+                    let opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = `${p[0]} (${p[1]})`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error("Отримано не JSON. Можливо, помилка в скрипті:", text);
+                throw new Error("Скрипт повернув HTML замість даних. Перевірте Deployment!");
+            }
+        })
+        .catch(err => {
+            console.error("Помилка завантаження:", err);
+            document.getElementById('participantName').innerHTML = `<option value="">Помилка конфігурації скрипта</option>`;
+        });
 }
 
 // Функція для відображення відео
