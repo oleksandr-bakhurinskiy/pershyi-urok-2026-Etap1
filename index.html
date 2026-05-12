@@ -230,21 +230,29 @@ function handleCredentialResponse(response) {
     let participantsData = []; // Глобальна змінна для зберігання даних учасників
 
 function loadParticipants() {
-    const url = GOOGLE_SCRIPT_URL + '?action=getParticipants&t=' + new Date().getTime();
+    // Передаємо email як параметр у запиті
+    const url = `${GOOGLE_SCRIPT_URL}?action=getParticipants&email=${currentUserEmail}&t=${new Date().getTime()}`;
+    
     fetch(url)
         .then(res => res.json())
         .then(participants => {
-            participantsData = participants; // Зберігаємо масив
+            participantsData = participants; 
             const select = document.getElementById('participantName');
-            select.innerHTML = '<option value="">-- Оберіть студента --</option>';
             
+            if (participants.length === 0) {
+                select.innerHTML = '<option value="">Ви оцінили всіх доступних учасників</option>';
+                return;
+            }
+
+            select.innerHTML = '<option value="">-- Оберіть студента --</option>';
             participants.forEach((p, index) => {
                 let opt = document.createElement('option');
-                opt.value = index; // Використовуємо індекс для пошуку
+                opt.value = index;
                 opt.textContent = `${p[0]} (${p[1]})`;
                 select.appendChild(opt);
             });
-        });
+        })
+        .catch(err => console.error("Помилка:", err));
 }
 
 // Функція для відображення відео
