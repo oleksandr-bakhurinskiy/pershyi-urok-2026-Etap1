@@ -249,7 +249,7 @@ function loadParticipants() {
                     return;
                 }
 
-                select.innerHTML = '<option value="">-- Оберіть студента --</option>';
+                select.innerHTML = '<option value="">-- Оберіть учасника --</option>';
                 participants.forEach((p, index) => {
                     let opt = document.createElement('option');
                     opt.value = index;
@@ -355,7 +355,7 @@ const data = {
             cache: 'no-cache',
             body: JSON.stringify(data)
         }).then(() => {
-            alert("Дані надіслано! Перевірте таблицю.");
+            alert("Дані надіслано!");
             location.reload();
         }).catch(err => {
             alert("Помилка відправки: " + err);
