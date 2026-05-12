@@ -306,13 +306,27 @@
     "vdemkova@ipp.org.ua"];
 
     window.onload = function () {
-        google.accounts.id.initialize({
-    client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com",
-    callback: handleCredentialResponse,
+    google.accounts.id.initialize({
+        client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com",
+        callback: handleCredentialResponse,
+        // Ми НЕ використовуємо redirect тут, щоб не було помилки 405 на GitHub
+        ux_mode: 'popup', 
+        context: 'signin',
+        // Цей параметр допомагає на мобільних пристроях:
+        itp_support: true 
+    });
     
-});
-        google.accounts.id.renderButton(document.getElementById("buttonDiv"), { theme: "outline", size: "large" });
-    };
+    google.accounts.id.renderButton(
+        document.getElementById("buttonDiv"),
+        { 
+            theme: "outline", 
+            size: "large", 
+            width: 250,
+            // Це важливо для мобільних:
+            shape: "pill" 
+        }
+    );
+};
 
     function handleCredentialResponse(response) {
     try {
