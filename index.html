@@ -35,7 +35,14 @@
                 <option value="">Завантаження списку...</option>
             </select>
         </div>
-
+<div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
+    <h4 class="text-primary border-bottom pb-2">Відеовізитка учасника (до 90 сек)</h4>
+    <div id="videoContainer" class="ratio ratio-16x9">
+        <div class="bg-light d-flex align-items-center justify-content-center text-muted">
+            Оберіть учасника, щоб переглянути відео
+        </div>
+    </div>
+</div>
         <div class="container mt-4">
 
     <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
@@ -220,34 +227,50 @@ function handleCredentialResponse(response) {
     }
 }
 
-    // Завантаження списку через Fetch
-    function loadParticipants() {
-    // Додаємо випадковий параметр, щоб уникнути кешування браузером
+    let participantsData = []; // Глобальна змінна для зберігання даних учасників
+
+function loadParticipants() {
     const url = GOOGLE_SCRIPT_URL + '?action=getParticipants&t=' + new Date().getTime();
-    
     fetch(url)
-        .then(res => {
-            if (!res.ok) throw new Error('Network response was not ok');
-            return res.json();
-        })
+        .then(res => res.json())
         .then(participants => {
-            console.log("Отримані дані:", participants); // Для перевірки в консолі
-            if (!Array.isArray(participants)) {
-                throw new Error("Отримані дані не є масивом!");
-            }
+            participantsData = participants; // Зберігаємо масив
             const select = document.getElementById('participantName');
             select.innerHTML = '<option value="">-- Оберіть студента --</option>';
-            participants.forEach(p => {
+            
+            participants.forEach((p, index) => {
                 let opt = document.createElement('option');
-                opt.value = p[0];
+                opt.value = index; // Використовуємо індекс для пошуку
                 opt.textContent = `${p[0]} (${p[1]})`;
                 select.appendChild(opt);
             });
-        })
-        .catch(err => {
-            console.error("Помилка завантаження учасників:", err);
-            document.getElementById('participantName').innerHTML = '<option value="">Помилка завантаження</option>';
         });
+}
+
+// Функція для відображення відео
+document.getElementById('participantName').onchange = function() {
+    const index = this.value;
+    const container = document.getElementById('videoContainer');
+    
+    if (index === "") {
+        container.innerHTML = '<div class="bg-light d-flex align-items-center justify-content-center text-muted">Оберіть учасника...</div>';
+        return;
+    }
+
+    const videoUrl = participantsData[index][2]; // Беремо посилання з 3-ї колонки (індекс 2)
+    if (videoUrl) {
+        const videoId = extractVideoId(videoUrl);
+        container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+    } else {
+        container.innerHTML = '<div class="alert alert-warning">Відео для цього учасника не знайдено</div>';
+    }
+};
+
+// Допоміжна функція для отримання ID відео
+function extractVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length == 11) ? match[2] : null;
 }
 
     // Відправка форми через Fetch (POST)
@@ -258,11 +281,12 @@ function handleCredentialResponse(response) {
         btn.textContent = 'Зберігаємо...';
 
         const formData = new FormData(this);
-        const data = {
-            email: currentUserEmail,
-            participantName: formData.get('participantName'),
-            scores: {}
-        };
+        const selectedIndex = document.getElementById('participantName').value;
+const data = {
+    email: currentUserEmail,
+    participantName: participantsData[selectedIndex][0], // Беремо справжнє ПІБ за індексом
+    scores: {}
+};
 
         for (let [key, value] of formData.entries()) {
             if (key.startsWith('s')) data.scores[key] = value;
