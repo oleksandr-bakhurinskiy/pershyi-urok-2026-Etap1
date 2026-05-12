@@ -12,6 +12,9 @@
         .sticky-header { position: sticky; top: 0; background: #f8f9fa; z-index: 1000; padding: 10px 0; border-bottom: 2px solid #dee2e6; }
         #authOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .hidden { display: none !important; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .empty-video { background: #e9ecef; display: flex; align-items: center; justify-content: center; height: 300px; border-radius: 8px; color: #6c757d; }
     </style>
 </head>
 <body>
@@ -31,224 +34,79 @@
     <form id="evaluationForm">
         <div class="criterion-group">
             <label class="form-label fw-bold">1. Оберіть учасника:</label>
-            <select class="form-select" id="participantName" name="participantName" required>
+            <select class="form-select mb-3" id="participantName" name="participantName" required>
                 <option value="">Завантаження списку...</option>
             </select>
+            
+            <div id="videoDisplay">
+                <div class="empty-video">Оберіть учасника, щоб переглянути відео</div>
+            </div>
         </div>
-<div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-    <h4 class="text-primary border-bottom pb-2">Відеовізитка учасника (до 90 сек)</h4>
-    <div id="videoContainer" class="ratio ratio-16x9">
-        <div class="bg-light d-flex align-items-center justify-content-center text-muted">
-            Оберіть учасника, щоб переглянути відео
-        </div>
-    </div>
-</div>
+
         <div class="container mt-4">
-
-    <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-        <h4 class="text-primary border-bottom pb-2">1. Педагогічне мислення і розуміння питання (макс. 30 балів)</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start" style="width: 52%;">Підкритерій</th>
-                        <th style="width: 8%;">0</th>
-                        <th style="width: 8%;">1</th>
-                        <th style="width: 8%;">2</th>
-                        <th style="width: 8%;">3</th>
-                        <th style="width: 8%;">4</th>
-                        <th style="width: 8%;">5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>1.1. Відповідь саме на поставлене педагогічне питання</td><td class="text-center"><input type="radio" name="s1_1" value="0" required></td><td class="text-center"><input type="radio" name="s1_1" value="1"></td><td class="text-center"><input type="radio" name="s1_1" value="2"></td><td class="text-center"><input type="radio" name="s1_1" value="3"></td><td class="text-center"><input type="radio" name="s1_1" value="4"></td><td class="text-center"><input type="radio" name="s1_1" value="5"></td></tr>
-                    <tr><td>1.2. Розуміння реальної навчальної або виховної ситуації</td><td class="text-center"><input type="radio" name="s1_2" value="0" required></td><td class="text-center"><input type="radio" name="s1_2" value="1"></td><td class="text-center"><input type="radio" name="s1_2" value="2"></td><td class="text-center"><input type="radio" name="s1_2" value="3"></td><td class="text-center"><input type="radio" name="s1_2" value="4"></td><td class="text-center"><input type="radio" name="s1_2" value="5"></td></tr>
-                    <tr><td>1.3. Зв'язок між проблемою, діями вчителя та результатом</td><td class="text-center"><input type="radio" name="s1_3" value="0" required></td><td class="text-center"><input type="radio" name="s1_3" value="1"></td><td class="text-center"><input type="radio" name="s1_3" value="2"></td><td class="text-center"><input type="radio" name="s1_3" value="3"></td><td class="text-center"><input type="radio" name="s1_3" value="4"></td><td class="text-center"><input type="radio" name="s1_3" value="5"></td></tr>
-                    <tr><td>1.4. Професійне, а не лише емоційне бачення ролі вчителя</td><td class="text-center"><input type="radio" name="s1_4" value="0" required></td><td class="text-center"><input type="radio" name="s1_4" value="1"></td><td class="text-center"><input type="radio" name="s1_4" value="2"></td><td class="text-center"><input type="radio" name="s1_4" value="3"></td><td class="text-center"><input type="radio" name="s1_4" value="4"></td><td class="text-center"><input type="radio" name="s1_4" value="5"></td></tr>
-                    <tr><td>1.5. Наявність конкретного педагогічного прикладу</td><td class="text-center"><input type="radio" name="s1_5" value="0" required></td><td class="text-center"><input type="radio" name="s1_5" value="1"></td><td class="text-center"><input type="radio" name="s1_5" value="2"></td><td class="text-center"><input type="radio" name="s1_5" value="3"></td><td class="text-center"><input type="radio" name="s1_5" value="4"></td><td class="text-center"><input type="radio" name="s1_5" value="5"></td></tr>
-                    <tr><td>1.6. Логіка «бачу проблему — пропоную дію — очікую результат»</td><td class="text-center"><input type="radio" name="s1_6" value="0" required></td><td class="text-center"><input type="radio" name="s1_6" value="1"></td><td class="text-center"><input type="radio" name="s1_6" value="2"></td><td class="text-center"><input type="radio" name="s1_6" value="3"></td><td class="text-center"><input type="radio" name="s1_6" value="4"></td><td class="text-center"><input type="radio" name="s1_6" value="5"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-        <h4 class="text-primary border-bottom pb-2">2. Логіка і структура відповіді (макс. 20 балів)</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start" style="width: 52%;">Підкритерій</th>
-                        <th style="width: 8%;">0</th>
-                        <th style="width: 8%;">1</th>
-                        <th style="width: 8%;">2</th>
-                        <th style="width: 8%;">3</th>
-                        <th style="width: 8%;">4</th>
-                        <th style="width: 8%;">5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>2.1. Зрозумілий початок, основна думка й завершення</td><td class="text-center"><input type="radio" name="s2_1" value="0" required></td><td class="text-center"><input type="radio" name="s2_1" value="1"></td><td class="text-center"><input type="radio" name="s2_1" value="2"></td><td class="text-center"><input type="radio" name="s2_1" value="3"></td><td class="text-center"><input type="radio" name="s2_1" value="4"></td><td class="text-center"><input type="radio" name="s2_1" value="5"></td></tr>
-                    <tr><td>2.2. Послідовний виклад без хаотичних переходів</td><td class="text-center"><input type="radio" name="s2_2" value="0" required></td><td class="text-center"><input type="radio" name="s2_2" value="1"></td><td class="text-center"><input type="radio" name="s2_2" value="2"></td><td class="text-center"><input type="radio" name="s2_2" value="3"></td><td class="text-center"><input type="radio" name="s2_2" value="4"></td><td class="text-center"><input type="radio" name="s2_2" value="5"></td></tr>
-                    <tr><td>2.3. Вміння виділити головне в обмеженому часі</td><td class="text-center"><input type="radio" name="s2_3" value="0" required></td><td class="text-center"><input type="radio" name="s2_3" value="1"></td><td class="text-center"><input type="radio" name="s2_3" value="2"></td><td class="text-center"><input type="radio" name="s2_3" value="3"></td><td class="text-center"><input type="radio" name="s2_3" value="4"></td><td class="text-center"><input type="radio" name="s2_3" value="5"></td></tr>
-                    <tr><td>2.4. Відсутність зайвих деталей або декларативних гасел</td><td class="text-center"><input type="radio" name="s2_4" value="0" required></td><td class="text-center"><input type="radio" name="s2_4" value="1"></td><td class="text-center"><input type="radio" name="s2_4" value="2"></td><td class="text-center"><input type="radio" name="s2_4" value="3"></td><td class="text-center"><input type="radio" name="s2_4" value="4"></td><td class="text-center"><input type="radio" name="s2_4" value="5"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-        <h4 class="text-primary border-bottom pb-2">3. Комунікація в кадрі (макс. 20 балів)</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start" style="width: 52%;">Підкритерій</th>
-                        <th style="width: 8%;">0</th>
-                        <th style="width: 8%;">1</th>
-                        <th style="width: 8%;">2</th>
-                        <th style="width: 8%;">3</th>
-                        <th style="width: 8%;">4</th>
-                        <th style="width: 8%;">5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>3.1. Чітке, зрозуміле, граматично коректне мовлення</td><td class="text-center"><input type="radio" name="s3_1" value="0" required></td><td class="text-center"><input type="radio" name="s3_1" value="1"></td><td class="text-center"><input type="radio" name="s3_1" value="2"></td><td class="text-center"><input type="radio" name="s3_1" value="3"></td><td class="text-center"><input type="radio" name="s3_1" value="4"></td><td class="text-center"><input type="radio" name="s3_1" value="5"></td></tr>
-                    <tr><td>3.2. Зручний темп мовлення для сприйняття</td><td class="text-center"><input type="radio" name="s3_2" value="0" required></td><td class="text-center"><input type="radio" name="s3_2" value="1"></td><td class="text-center"><input type="radio" name="s3_2" value="2"></td><td class="text-center"><input type="radio" name="s3_2" value="3"></td><td class="text-center"><input type="radio" name="s3_2" value="4"></td><td class="text-center"><input type="radio" name="s3_2" value="5"></td></tr>
-                    <tr><td>3.3. Природна, впевнена поведінка без театральності</td><td class="text-center"><input type="radio" name="s3_3" value="0" required></td><td class="text-center"><input type="radio" name="s3_3" value="1"></td><td class="text-center"><input type="radio" name="s3_3" value="2"></td><td class="text-center"><input type="radio" name="s3_3" value="3"></td><td class="text-center"><input type="radio" name="s3_3" value="4"></td><td class="text-center"><input type="radio" name="s3_3" value="5"></td></tr>
-                    <tr><td>3.4. Відчуття звернення до глядача/аудиторії</td><td class="text-center"><input type="radio" name="s3_4" value="0" required></td><td class="text-center"><input type="radio" name="s3_4" value="1"></td><td class="text-center"><input type="radio" name="s3_4" value="2"></td><td class="text-center"><input type="radio" name="s3_4" value="3"></td><td class="text-center"><input type="radio" name="s3_4" value="4"></td><td class="text-center"><input type="radio" name="s3_4" value="5"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-        <h4 class="text-primary border-bottom pb-2">4. Мотивація і професійна позиція (макс. 15 балів)</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start" style="width: 52%;">Підкритерій</th>
-                        <th style="width: 8%;">0</th>
-                        <th style="width: 8%;">1</th>
-                        <th style="width: 8%;">2</th>
-                        <th style="width: 8%;">3</th>
-                        <th style="width: 8%;">4</th>
-                        <th style="width: 8%;">5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>4.1. Усвідомлена, а не формальна мотивація бути вчителем</td><td class="text-center"><input type="radio" name="s4_1" value="0" required></td><td class="text-center"><input type="radio" name="s4_1" value="1"></td><td class="text-center"><input type="radio" name="s4_1" value="2"></td><td class="text-center"><input type="radio" name="s4_1" value="3"></td><td class="text-center"><input type="radio" name="s4_1" value="4"></td><td class="text-center"><input type="radio" name="s4_1" value="5"></td></tr>
-                    <tr><td>4.2. Повага до дитини, навчання й професії</td><td class="text-center"><input type="radio" name="s4_2" value="0" required></td><td class="text-center"><input type="radio" name="s4_2" value="1"></td><td class="text-center"><input type="radio" name="s4_2" value="2"></td><td class="text-center"><input type="radio" name="s4_2" value="3"></td><td class="text-center"><input type="radio" name="s4_2" value="4"></td><td class="text-center"><input type="radio" name="s4_2" value="5"></td></tr>
-                    <tr><td>4.3. Відсутність стереотипних чи авторитарних установок</td><td class="text-center"><input type="radio" name="s4_3" value="0" required></td><td class="text-center"><input type="radio" name="s4_3" value="1"></td><td class="text-center"><input type="radio" name="s4_3" value="2"></td><td class="text-center"><input type="radio" name="s4_3" value="3"></td><td class="text-center"><input type="radio" name="s4_3" value="4"></td><td class="text-center"><input type="radio" name="s4_3" value="5"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-        <h4 class="text-primary border-bottom pb-2">5. Технічна якість і дотримання формату (макс. 15 балів)</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-center">
-                    <tr>
-                        <th class="text-start" style="width: 52%;">Підкритерій</th>
-                        <th style="width: 8%;">0</th>
-                        <th style="width: 8%;">1</th>
-                        <th style="width: 8%;">2</th>
-                        <th style="width: 8%;">3</th>
-                        <th style="width: 8%;">4</th>
-                        <th style="width: 8%;">5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>5.1. Відповідність часовому ліміту та тех. вимогам</td><td class="text-center"><input type="radio" name="s5_1" value="0" required></td><td class="text-center"><input type="radio" name="s5_1" value="1"></td><td class="text-center"><input type="radio" name="s5_1" value="2"></td><td class="text-center"><input type="radio" name="s5_1" value="3"></td><td class="text-center"><input type="radio" name="s5_1" value="4"></td><td class="text-center"><input type="radio" name="s5_1" value="5"></td></tr>
-                    <tr><td>5.2. Якість звуку, освітлення та зображення</td><td class="text-center"><input type="radio" name="s5_2" value="0" required></td><td class="text-center"><input type="radio" name="s5_2" value="1"></td><td class="text-center"><input type="radio" name="s5_2" value="2"></td><td class="text-center"><input type="radio" name="s5_2" value="3"></td><td class="text-center"><input type="radio" name="s5_2" value="4"></td><td class="text-center"><input type="radio" name="s5_2" value="5"></td></tr>
-                    <tr><td>5.3. Технічне оформлення не відволікає від змісту</td><td class="text-center"><input type="radio" name="s5_3" value="0" required></td><td class="text-center"><input type="radio" name="s5_3" value="1"></td><td class="text-center"><input type="radio" name="s5_3" value="2"></td><td class="text-center"><input type="radio" name="s5_3" value="3"></td><td class="text-center"><input type="radio" name="s5_3" value="4"></td><td class="text-center"><input type="radio" name="s5_3" value="5"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
+            <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
+                <h4 class="text-primary border-bottom pb-2">1. Педагогічне мислення (макс. 30 балів)</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th class="text-start" style="width: 52%;">Підкритерій</th>
+                                <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1.1. Відповідь саме на поставлене педагогічне питання</td><td class="text-center"><input type="radio" name="s1_1" value="0" required></td><td class="text-center"><input type="radio" name="s1_1" value="1"></td><td class="text-center"><input type="radio" name="s1_1" value="2"></td><td class="text-center"><input type="radio" name="s1_1" value="3"></td><td class="text-center"><input type="radio" name="s1_1" value="4"></td><td class="text-center"><input type="radio" name="s1_1" value="5"></td></tr>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
 
         <button type="submit" class="btn btn-primary btn-lg w-100 mb-5">Зберегти оцінку</button>
     </form>
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBQxK52eUf0zhIkLYgoTj_5EgDvc8u7Tm-v6hP-vDUAOPJm84AipHMCJoUE01PySgzXg/exec'; // ВСТАВТЕ СЮДИ URL ПІСЛЯ DEPLOY
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBQxK52eUf0zhIkLYgoTj_5EgDvc8u7Tm-v6hP-vDUAOPJm84AipHMCJoUE01PySgzXg/exec'; 
     let currentUserEmail = "";
+    let participantsData = []; 
+    const allowedEmails = ["obakhurinskyi@ipp.org.ua"];
 
-    // Ініціалізація Google Auth
     window.onload = function () {
         google.accounts.id.initialize({
-            client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com", // ПОТРІБНО СТВОРИТИ В GOOGLE CONSOLE
+            client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com",
             callback: handleCredentialResponse
         });
-        google.accounts.id.renderButton(
-            document.getElementById("buttonDiv"),
-            { theme: "outline", size: "large" }
-        );
+        google.accounts.id.renderButton(document.getElementById("buttonDiv"), { theme: "outline", size: "large" });
     };
 
-    // Обробка входу
-    // Додайте ваш білий список прямо в JavaScript на GitHub
-const allowedEmails = [
-    "obakhurinskyi@ipp.org.ua"
-];
-
-function handleCredentialResponse(response) {
-    // Розшифровуємо дані користувача
-    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    currentUserEmail = payload.email.toLowerCase(); // Переводимо в нижній регістр для надійності
-    
-    // ПЕРЕВІРКА: чи є пошта в списку
-    if (allowedEmails.includes(currentUserEmail)) {
-        // Якщо ТАК — показуємо контент
-        document.getElementById('authOverlay').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-        document.getElementById('userEmailDisplay').textContent = currentUserEmail;
-        loadParticipants();
-    } else {
-        // Якщо НІ — виводимо повідомлення про помилку і не пускаємо далі
-        const authMessage = document.querySelector('#authOverlay p');
-        authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
+    function handleCredentialResponse(response) {
+        const payload = JSON.parse(atob(response.credential.split('.')[1]));
+        currentUserEmail = payload.email.toLowerCase();
         
-        // Можна також приховати кнопку входу, щоб не клацали зайвий раз
-        document.getElementById('buttonDiv').classList.add('hidden');
-        
-        // Додаємо кнопку "Спробувати інший акаунт"
-        const retryBtn = document.createElement('button');
-        retryBtn.textContent = "Увійти під іншим акаунтом";
-        retryBtn.className = "btn btn-outline-secondary mt-3";
-        retryBtn.onclick = () => location.reload();
-        document.getElementById('authOverlay').appendChild(retryBtn);
+        if (allowedEmails.includes(currentUserEmail)) {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+            loadParticipants();
+        } else {
+            const authMessage = document.querySelector('#authOverlay p');
+            authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
+            document.getElementById('buttonDiv').classList.add('hidden');
+        }
     }
-}
 
-    let participantsData = []; // Глобальна змінна для зберігання даних учасників
-
-function loadParticipants() {
-    const url = `${GOOGLE_SCRIPT_URL}?action=getParticipants&email=${currentUserEmail}&t=${new Date().getTime()}`;
-    
-    fetch(url)
-        .then(response => {
-            // Перевірка, чи не прийшла помилка 404 або 500
-            if (!response.ok) throw new Error('Скрипт повернув помилку ' + response.status);
-            return response.text(); // Спочатку беремо як текст, щоб перевірити
-        })
-        .then(text => {
-            try {
-                const participants = JSON.parse(text); // Пробуємо перетворити на JSON
+    function loadParticipants() {
+        const url = `${GOOGLE_SCRIPT_URL}?action=getParticipants&email=${currentUserEmail}&t=${new Date().getTime()}`;
+        fetch(url)
+            .then(res => res.json())
+            .then(participants => {
                 participantsData = participants; 
                 const select = document.getElementById('participantName');
-                
                 if (participants.length === 0) {
-                    select.innerHTML = '<option value="">Всі учасники вже оцінені</option>';
+                    select.innerHTML = '<option value="">Всі доступні учасники оцінені</option>';
                     return;
                 }
-
                 select.innerHTML = '<option value="">-- Оберіть учасника --</option>';
                 participants.forEach((p, index) => {
                     let opt = document.createElement('option');
@@ -256,26 +114,18 @@ function loadParticipants() {
                     opt.textContent = `${p[0]} (${p[1]})`;
                     select.appendChild(opt);
                 });
-            } catch (e) {
-                console.error("Отримано не JSON. Можливо, помилка в скрипті:", text);
-                throw new Error("Скрипт повернув HTML замість даних. Перевірте Deployment!");
-            }
-        })
-        .catch(err => {
-            console.error("Помилка завантаження:", err);
-            document.getElementById('participantName').innerHTML = `<option value="">Помилка конфігурації скрипта</option>`;
-        });
-}
+            })
+            .catch(err => console.error("Помилка завантаження учасників:", err));
+    }
 
-// Функція для відображення відео
-document.getElementById('participantName').onchange = function() {
+    document.getElementById('participantName').onchange = function() {
         const index = this.value;
         const videoDiv = document.getElementById('videoDisplay');
         if (index === "") {
             videoDiv.innerHTML = '<div class="empty-video">Оберіть учасника...</div>';
             return;
         }
-        const videoUrl = participantsData[index][2];
+        const videoUrl = participantsData[index][2]; // Переконайтеся, що посилання в 3-й колонці
         const videoId = extractVideoId(videoUrl);
         if (videoId) {
             videoDiv.innerHTML = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
@@ -291,7 +141,7 @@ document.getElementById('participantName').onchange = function() {
         return (match && match[2].length == 11) ? match[2] : null;
     }
 
-    // ОДИН обробник форми
+    // ТІЛЬКИ ОДИН ОБРОБНИК ФОРМИ
     document.getElementById('evaluationForm').onsubmit = function(e) {
         e.preventDefault();
         const selectedIndex = document.getElementById('participantName').value;
@@ -319,9 +169,9 @@ document.getElementById('participantName').onchange = function() {
             body: JSON.stringify(data)
         }).then(() => {
             alert("Оцінку збережено!");
-            this.reset(); // Очищуємо форму
+            this.reset(); 
             document.getElementById('videoDisplay').innerHTML = '<div class="empty-video">Оберіть наступного учасника...</div>';
-            loadParticipants(); // Оновлюємо список
+            loadParticipants(); 
             btn.disabled = false;
             btn.textContent = originalText;
             window.scrollTo(0, 0);
@@ -332,6 +182,5 @@ document.getElementById('participantName').onchange = function() {
         });
     };
 </script>
-
 </body>
 </html>
