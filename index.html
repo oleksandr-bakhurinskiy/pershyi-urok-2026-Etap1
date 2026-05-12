@@ -186,16 +186,40 @@
     };
 
     // Обробка входу
-    function handleCredentialResponse(response) {
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
-        currentUserEmail = payload.email;
-        
+    // Додайте ваш білий список прямо в JavaScript на GitHub
+const allowedEmails = [
+    "obakhurinskyi@ipp.org.ua",
+    "bah.sasha1@gmail.com"
+];
+
+function handleCredentialResponse(response) {
+    // Розшифровуємо дані користувача
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    currentUserEmail = payload.email.toLowerCase(); // Переводимо в нижній регістр для надійності
+    
+    // ПЕРЕВІРКА: чи є пошта в списку
+    if (allowedEmails.includes(currentUserEmail)) {
+        // Якщо ТАК — показуємо контент
         document.getElementById('authOverlay').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
         document.getElementById('userEmailDisplay').textContent = currentUserEmail;
-        
         loadParticipants();
+    } else {
+        // Якщо НІ — виводимо повідомлення про помилку і не пускаємо далі
+        const authMessage = document.querySelector('#authOverlay p');
+        authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
+        
+        // Можна також приховати кнопку входу, щоб не клацали зайвий раз
+        document.getElementById('buttonDiv').classList.add('hidden');
+        
+        // Додаємо кнопку "Спробувати інший акаунт"
+        const retryBtn = document.createElement('button');
+        retryBtn.textContent = "Увійти під іншим акаунтом";
+        retryBtn.className = "btn btn-outline-secondary mt-3";
+        retryBtn.onclick = () => location.reload();
+        document.getElementById('authOverlay').appendChild(retryBtn);
     }
+}
 
     // Завантаження списку через Fetch
     function loadParticipants() {
