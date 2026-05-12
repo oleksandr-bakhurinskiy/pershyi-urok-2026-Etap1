@@ -268,82 +268,46 @@ function loadParticipants() {
 }
 
 // Функція для відображення відео
-document.getElementById('evaluationForm').onsubmit = function(e) {
-    e.preventDefault();
-    const selectedIndex = document.getElementById('participantName').value;
-    if (selectedIndex === "") {
-        alert("Будь ласка, оберіть учасника!");
-        return;
-    }
-
-    const btn = e.target.querySelector('button');
-    const originalBtnText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Зберігаємо...';
-
-    const formData = new FormData(this);
-    const data = {
-        email: currentUserEmail,
-        participantName: participantsData[selectedIndex][0],
-        scores: {}
+document.getElementById('participantName').onchange = function() {
+        const index = this.value;
+        const videoDiv = document.getElementById('videoDisplay');
+        if (index === "") {
+            videoDiv.innerHTML = '<div class="empty-video">Оберіть учасника...</div>';
+            return;
+        }
+        const videoUrl = participantsData[index][2];
+        const videoId = extractVideoId(videoUrl);
+        if (videoId) {
+            videoDiv.innerHTML = `<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+        } else {
+            videoDiv.innerHTML = '<div class="alert alert-warning mt-2">Відео не знайдено</div>';
+        }
     };
 
-    for (let [key, value] of formData.entries()) {
-        if (key.startsWith('s')) data.scores[key] = value;
+    function extractVideoId(url) {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length == 11) ? match[2] : null;
     }
 
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        cache: 'no-cache',
-        body: JSON.stringify(data)
-    }).then(() => {
-        alert("Оцінку для " + data.participantName + " успішно збережено!");
-        
-        // 1. Очищуємо всі обрані радіо-кнопки
-        this.reset();
-        
-        // 2. Очищуємо вікно відео
-        document.getElementById('videoDisplay').innerHTML = '<div class="empty-video">Оберіть наступного учасника...</div>';
-        
-        // 3. Оновлюємо список учасників (щоб видалити того, кого вже оцінили)
-        loadParticipants();
-        
-        // 4. Повертаємо кнопку в робочий стан
-        btn.disabled = false;
-        btn.textContent = originalBtnText;
-        
-        // Скролимо вгору сторінки для зручності
-        window.scrollTo(0, 0);
-        
-    }).catch(err => {
-        alert("Помилка відправки: " + err);
-        btn.disabled = false;
-        btn.textContent = originalBtnText;
-    });
-};
-
-// Допоміжна функція для отримання ID відео
-function extractVideoId(url) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length == 11) ? match[2] : null;
-}
-
-    // Відправка форми через Fetch (POST)
+    // ОДИН обробник форми
     document.getElementById('evaluationForm').onsubmit = function(e) {
         e.preventDefault();
+        const selectedIndex = document.getElementById('participantName').value;
+        if (selectedIndex === "") return;
+
         const btn = e.target.querySelector('button');
+        const originalText = btn.textContent;
         btn.disabled = true;
         btn.textContent = 'Зберігаємо...';
 
         const formData = new FormData(this);
-        const selectedIndex = document.getElementById('participantName').value;
-const data = {
-    email: currentUserEmail,
-    participantName: participantsData[selectedIndex][0], // Беремо справжнє ПІБ за індексом
-    scores: {}
-};
+        const data = {
+            email: currentUserEmail,
+            participantName: participantsData[selectedIndex][0],
+            scores: {}
+        };
 
         for (let [key, value] of formData.entries()) {
             if (key.startsWith('s')) data.scores[key] = value;
@@ -351,15 +315,20 @@ const data = {
 
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // Важливо для Apps Script
-            cache: 'no-cache',
+            mode: 'no-cors',
             body: JSON.stringify(data)
         }).then(() => {
-            alert("Дані надіслано!");
-            location.reload();
-        }).catch(err => {
-            alert("Помилка відправки: " + err);
+            alert("Оцінку збережено!");
+            this.reset(); // Очищуємо форму
+            document.getElementById('videoDisplay').innerHTML = '<div class="empty-video">Оберіть наступного учасника...</div>';
+            loadParticipants(); // Оновлюємо список
             btn.disabled = false;
+            btn.textContent = originalText;
+            window.scrollTo(0, 0);
+        }).catch(err => {
+            alert("Помилка: " + err);
+            btn.disabled = false;
+            btn.textContent = originalText;
         });
     };
 </script>
