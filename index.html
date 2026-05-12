@@ -307,32 +307,62 @@
 
     window.onload = function () {
         google.accounts.id.initialize({
-            client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
+    client_id: "829527564010-3cct1qlnv3cdlp88c5b54uio8b1j93rb.apps.googleusercontent.com",
+    callback: handleCredentialResponse,
+    ux_mode: 'redirect' // Це змусить iPhone не відкривати вікно, а перезавантажувати сторінку для входу
+});
         google.accounts.id.renderButton(document.getElementById("buttonDiv"), { theme: "outline", size: "large" });
     };
 
     function handleCredentialResponse(response) {
-    // Надійний спосіб розшифровки JWT токена від Google
-    const base64Url = response.credential.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    try {
+        // 1. Отримуємо другу частину токена (payload)
+        const base64Url = response.credential.split('.')[1];
+        
+        // 2. Очищаємо від пробілів та виправляємо символи Base64 (критично для iOS)
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/').trim();
+        
+        // 3. Декодуємо Base64 з урахуванням юнікоду (кирилиця в іменах)
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
 
-    const payload = JSON.parse(jsonPayload);
-    currentUserEmail = payload.email.toLowerCase();
-    
-    // Далі ваша логіка перевірки...
-    if (allowedEmails.includes(currentUserEmail)) {
-        document.getElementById('authOverlay').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-        document.getElementById('userEmailDisplay').textContent = currentUserEmail;
-        loadParticipants();
-    } else {
-        const authMessage = document.querySelector('#authOverlay p');
-        authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
+        const payload = JSON.parse(jsonPayload);
+        currentUserEmail = payload.email.toLowerCase();
+        
+        console.log("Авторизовано як:", currentUserEmail);
+
+        // 4. Перевірка доступу (білий список)
+        if (allowedEmails.includes(currentUserEmail)) {
+            // Ховаємо екран входу
+            document.getElementById('authOverlay').classList.add('hidden');
+            // Показуємо основний контент
+            document.getElementById('mainContent').classList.remove('hidden');
+            // Виводимо email в шапку
+            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+            
+            // Завантажуємо список учасників
+            loadParticipants();
+        } else {
+            // Якщо пошти немає в списку
+            const authMessage = document.querySelector('#authOverlay p');
+            authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
+            
+            // Приховуємо кнопку, щоб змусити перезайти
+            document.getElementById('buttonDiv').style.display = 'none';
+            
+            if (!document.getElementById('retryBtn')) {
+                const retryBtn = document.createElement('button');
+                retryBtn.id = 'retryBtn';
+                retryBtn.textContent = "Спробувати інший акаунт";
+                retryBtn.className = "btn btn-outline-secondary mt-3";
+                retryBtn.onclick = () => location.reload();
+                document.getElementById('authOverlay').appendChild(retryBtn);
+            }
+        }
+    } catch (error) {
+        console.error("Помилка авторизації:", error);
+        alert("Сталася помилка при вході. Якщо ви використовуєте iPhone, спробуйте відкрити посилання у браузері Chrome або вимкніть 'Prevent Cross-Site Tracking' у налаштуваннях Safari.");
     }
 }
 
