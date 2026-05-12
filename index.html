@@ -268,22 +268,59 @@ function loadParticipants() {
 }
 
 // Функція для відображення відео
-document.getElementById('participantName').onchange = function() {
-    const index = this.value;
-    const container = document.getElementById('videoContainer');
-    
-    if (index === "") {
-        container.innerHTML = '<div class="bg-light d-flex align-items-center justify-content-center text-muted">Оберіть учасника...</div>';
+document.getElementById('evaluationForm').onsubmit = function(e) {
+    e.preventDefault();
+    const selectedIndex = document.getElementById('participantName').value;
+    if (selectedIndex === "") {
+        alert("Будь ласка, оберіть учасника!");
         return;
     }
 
-    const videoUrl = participantsData[index][2]; // Беремо посилання з 3-ї колонки (індекс 2)
-    if (videoUrl) {
-        const videoId = extractVideoId(videoUrl);
-        container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
-    } else {
-        container.innerHTML = '<div class="alert alert-warning">Відео для цього учасника не знайдено</div>';
+    const btn = e.target.querySelector('button');
+    const originalBtnText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Зберігаємо...';
+
+    const formData = new FormData(this);
+    const data = {
+        email: currentUserEmail,
+        participantName: participantsData[selectedIndex][0],
+        scores: {}
+    };
+
+    for (let [key, value] of formData.entries()) {
+        if (key.startsWith('s')) data.scores[key] = value;
     }
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        cache: 'no-cache',
+        body: JSON.stringify(data)
+    }).then(() => {
+        alert("Оцінку для " + data.participantName + " успішно збережено!");
+        
+        // 1. Очищуємо всі обрані радіо-кнопки
+        this.reset();
+        
+        // 2. Очищуємо вікно відео
+        document.getElementById('videoDisplay').innerHTML = '<div class="empty-video">Оберіть наступного учасника...</div>';
+        
+        // 3. Оновлюємо список учасників (щоб видалити того, кого вже оцінили)
+        loadParticipants();
+        
+        // 4. Повертаємо кнопку в робочий стан
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+        
+        // Скролимо вгору сторінки для зручності
+        window.scrollTo(0, 0);
+        
+    }).catch(err => {
+        alert("Помилка відправки: " + err);
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+    });
 };
 
 // Допоміжна функція для отримання ID відео
