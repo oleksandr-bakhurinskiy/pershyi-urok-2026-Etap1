@@ -47,7 +47,7 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqRt7UGYR7g0tjtCOju2P4t3AsZQYno7PsidjVzBbUiPSIdZku-K0Rj12WbUxn3HSVeA/exec'; // ВСТАВТЕ СЮДИ URL ПІСЛЯ DEPLOY
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHEsP20xbXQVcbqwWvNtpfPfiHrmKj0I4dz0MlprYAucK4IXY5wRZJHbTV4RbCC8PQjg/exec'; // ВСТАВТЕ СЮДИ URL ПІСЛЯ DEPLOY
     let currentUserEmail = "";
 
     // Ініціалізація Google Auth
@@ -76,19 +76,33 @@
 
     // Завантаження списку через Fetch
     function loadParticipants() {
-        fetch(`${GOOGLE_SCRIPT_URL}?action=getParticipants`)
-            .then(res => res.json())
-            .then(participants => {
-                const select = document.getElementById('participantName');
-                select.innerHTML = '<option value="">-- Оберіть студента --</option>';
-                participants.forEach(p => {
-                    let opt = document.createElement('option');
-                    opt.value = p[0];
-                    opt.textContent = `${p[0]} (${p[1]})`;
-                    select.appendChild(opt);
-                });
+    // Додаємо випадковий параметр, щоб уникнути кешування браузером
+    const url = GOOGLE_SCRIPT_URL + '?action=getParticipants&t=' + new Date().getTime();
+    
+    fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+        })
+        .then(participants => {
+            console.log("Отримані дані:", participants); // Для перевірки в консолі
+            if (!Array.isArray(participants)) {
+                throw new Error("Отримані дані не є масивом!");
+            }
+            const select = document.getElementById('participantName');
+            select.innerHTML = '<option value="">-- Оберіть студента --</option>';
+            participants.forEach(p => {
+                let opt = document.createElement('option');
+                opt.value = p[0];
+                opt.textContent = `${p[0]} (${p[1]})`;
+                select.appendChild(opt);
             });
-    }
+        })
+        .catch(err => {
+            console.error("Помилка завантаження учасників:", err);
+            document.getElementById('participantName').innerHTML = '<option value="">Помилка завантаження</option>';
+        });
+}
 
     // Відправка форми через Fetch (POST)
     document.getElementById('evaluationForm').onsubmit = function(e) {
