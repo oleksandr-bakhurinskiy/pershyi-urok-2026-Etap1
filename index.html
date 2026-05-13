@@ -425,7 +425,7 @@
                 participants.forEach((p, index) => {
                     let opt = document.createElement('option');
                     opt.value = index;
-                    opt.textContent = `${p[0]} (${p[1]})`;
+                    opt.textContent = p[0];
                     select.appendChild(opt);
                 });
             })
