@@ -243,6 +243,7 @@
     };
 
     // Скрол-функція (Picture-in-Picture) без багів
+    // Скрол-функція (Picture-in-Picture) - ВИПРАВЛЕНА
     window.addEventListener('scroll', function() {
         const videoWrapper = document.getElementById('videoWrapper');
         const player = document.getElementById('playerContainer');
@@ -250,16 +251,25 @@
         
         if (!player || participantSelect.value === "") return;
 
+        // Враховуємо висоту фіксованої шапки сайту
+        const headerOffset = 90; 
         const wrapperRect = videoWrapper.getBoundingClientRect();
 
-        // Фіксуємо безпосередньо сам контейнер плеєра всередині обгортки
-        if (wrapperRect.top < 0) {
+        // Якщо докрутили до відео
+        if (wrapperRect.top < headerOffset) {
             if (!player.classList.contains('sticky-video')) {
+                // 1. ЗАПАМ'ЯТОВУЄМО ВИСОТУ, щоб сторінка не стрибала!
+                videoWrapper.style.height = videoWrapper.offsetHeight + 'px';
+                // 2. Робимо відео плаваючим
                 player.classList.add('sticky-video');
             }
         } else {
+            // Якщо повернулися наверх
             if (player.classList.contains('sticky-video')) {
+                // 1. Повертаємо відео на місце
                 player.classList.remove('sticky-video');
+                // 2. Скидаємо висоту обгортки
+                videoWrapper.style.height = 'auto';
             }
         }
     });
