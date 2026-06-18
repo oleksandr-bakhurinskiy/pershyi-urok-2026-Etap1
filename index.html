@@ -327,13 +327,15 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNuEZUwwZ3szZluueLPSQFwTvzSvAnIvzaFk_WCBlEdzMUtkBNt-zqh3KGRoQU0VKFKw/exec'; 
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRzNZEDVllMmIfdctjttvoKTTTRGDvXVughQj2ukP9iBa1GfYe4mRFe2bD__ryDApc0g/exec'; 
     let currentUserEmail = "";
     let participantsData = []; 
-    const allowedEmails = ["obakhurinskyi@ipp.org.ua", 
-    "ihor.com@ipp.org.ua",
-    "bah.sasha1@gmail.com",
-    "okolotylo@ipp.org.ua"];
+    const juryCategories = {
+    "obakhurinskyi@ipp.org.ua": "А",
+    "ihor.com@ipp.org.ua": "А",
+    "bah.sasha1@gmail.com": "Б",
+    "okolotylo@ipp.org.ua": "Б"
+};
 
     window.onload = function () {
     google.accounts.id.initialize({
@@ -376,25 +378,33 @@
         
         console.log("Авторизовано як:", currentUserEmail);
 
-        // 4. Перевірка доступу (білий список)
-        if (allowedEmails.includes(currentUserEmail)) {
+        // --- НОВИЙ КОД: Визначаємо категорію журі ---
+        const myCategory = juryCategories[currentUserEmail];
+
+        // 4. Перевірка доступу (чи є для цієї пошти категорія)
+        if (myCategory) {
             // Ховаємо екран входу
             document.getElementById('authOverlay').classList.add('hidden');
             // Показуємо основний контент
             document.getElementById('mainContent').classList.remove('hidden');
-            // Виводимо email в шапку
-            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+            
+            // Виводимо email і красивий бейдж з категорією в шапку
+            document.getElementById('userEmailDisplay').innerHTML = `
+                ${currentUserEmail} 
+                <span class="badge bg-warning text-dark ms-2">Журі категорії ${myCategory}</span>
+            `;
             
             // Завантажуємо список учасників
             loadParticipants();
         } else {
-            // Якщо пошти немає в списку
+            // Якщо пошти немає в словнику juryCategories
             const authMessage = document.querySelector('#authOverlay p');
             authMessage.innerHTML = `<b style="color:red;">Доступ обмежено!</b><br>Адреса ${currentUserEmail} відсутня в списку журі.`;
             
             // Приховуємо кнопку, щоб змусити перезайти
             document.getElementById('buttonDiv').style.display = 'none';
             
+            // Залишаємо вашу кнопку для повторної спроби
             if (!document.getElementById('retryBtn')) {
                 const retryBtn = document.createElement('button');
                 retryBtn.id = 'retryBtn';
@@ -409,7 +419,6 @@
         alert("Сталася помилка при вході. Якщо ви використовуєте iPhone, спробуйте відкрити посилання у браузері Chrome або вимкніть 'Prevent Cross-Site Tracking' у налаштуваннях Safari.");
     }
 }
-
     function loadParticipants() {
         const url = `${GOOGLE_SCRIPT_URL}?action=getParticipants&email=${currentUserEmail}&t=${new Date().getTime()}`;
         fetch(url)
