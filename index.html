@@ -320,27 +320,18 @@
 
         </div>
         </div>
-    </div>
 
-            <div class="criterion-group border p-3 mb-4 rounded bg-white shadow-sm">
-                <h4 class="text-primary border-bottom pb-2">Коментар журі (необов'язково)</h4>
-                <div class="mt-3">
-                    <textarea class="form-control" id="juryComment" name="juryComment" rows="4" placeholder="Напишіть ваші враження або зауваження щодо цього учасника..."></textarea>
-                </div>
-            </div>
-
-        </div> <button type="submit" class="btn btn-primary btn-lg w-100 mb-5">Зберегти оцінку</button>
     </div>
-        
+        <button type="submit" class="btn btn-primary btn-lg w-100 mb-5">Зберегти оцінку</button>
     </form>
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJlMglhF2o2n6nh4Zb_q_fAvjcZvYKvCg0Es2fzqbFLrVNAbBp_DnSbzG7EsnYICgS2Q/exec'; 
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuVmyf9w8HNEEiGrAHZBkp3Sf0k_g4ppPD1lMEf6DSvmu1ulU7IjhKfK3k9AB322EmvQ/exec'; 
     let currentUserEmail = "";
     let participantsData = []; 
     const juryCategories = {
-  "obakhurinskyi@ipp.org.ua": "А",
+   "obakhurinskyi@ipp.org.ua": "А",
   "ihor.com@ipp.org.ua": "А",
   "bah.sasha1@gmail.com": "Б",
   "okolotylo@ipp.org.ua": "Б",
@@ -426,12 +417,10 @@
             document.getElementById('mainContent').classList.remove('hidden');
             
             // Виводимо email і красивий бейдж з категорією в шапку
-            // Виводимо email і красивий бейдж з категорією в шапку
-const badgeText = myCategory === "У" ? "категорії А/Б" : `категорії ${myCategory}`;
-document.getElementById('userEmailDisplay').innerHTML = `
-    ${currentUserEmail} 
-    <span class="badge bg-warning text-dark ms-2">Журі ${badgeText}</span>
-`;
+            document.getElementById('userEmailDisplay').innerHTML = `
+                ${currentUserEmail} 
+                <span class="badge bg-warning text-dark ms-2">Журі категорії ${myCategory}</span>
+            `;
             
             // Завантажуємо список учасників
             loadParticipants();
