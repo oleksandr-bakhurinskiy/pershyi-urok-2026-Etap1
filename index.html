@@ -204,7 +204,7 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyy8js8XTQm9aIgx7fcSnjz-3JtNQy8ZPCmRTtJte5Ybew3ZM0na3_UcIjlldcVF_HdPg/exec'; 
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLOt7rTX3uwfsLmByHjZ69tK8w_q6Paq7ADrxZRxvrOTNgGVGF-z_MajyViRgt1orOmg/exec'; 
     let currentUserEmail = "";
     let participantsData = []; 
     
@@ -325,10 +325,13 @@
                     return;
                 }
                 select.innerHTML = '<option value="">-- Оберіть учасника --</option>';
+                
                 participants.forEach((p, index) => {
                     let opt = document.createElement('option');
-                    opt.value = index;
-                    opt.textContent = `Учасник ${index + 1}`;
+                    // value залишається index для правильної роботи коду
+                    opt.value = index; 
+                    // p[3] - це оригінальний порядковий номер, який ми передали з бекенду
+                    opt.textContent = `Учасник ${p[3]}`; 
                     select.appendChild(opt);
                 });
             })
